@@ -16,4 +16,3 @@ venv/
 .git/
 .gitignore
 tests/
-requirements/requirements-test.txt
