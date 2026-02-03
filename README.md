@@ -15,6 +15,14 @@ source .venv/bin/activate  (Linux/Mac)
 .venv\Scripts\activate    (Windows)    
 ```
 
+## Installare dipendenze
+
+```shell
+uv pip compile requirements.in -o requirements.txt
+uv pip install -r requirements.txt
+```
+
+
 ## Utilizzo 
 
 ```shell
