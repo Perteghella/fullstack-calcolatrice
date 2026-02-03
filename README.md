@@ -61,3 +61,9 @@ Per costruire l'immagine Docker e caricarla su Docker Hub
 docker build -f Dockerfile -t perteghella/fullstack-calcolatrice:alpine .
 docker push perteghella/fullstack-calcolatrice:alpine
 ```
+
+Per costruire una immagine multiarchitettura e caricarla su Docker Hub
+
+```shell
+docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t perteghella/fullstack-calcolatrice:alpine --push .
+```
