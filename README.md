@@ -41,7 +41,7 @@ pytest -v
 
 ## Dockerfile
 
-Per costruire l'immagine Docker
+Per costruire l'immagine Docker locale
 
 ```shell
 docker build -f Dockerfile.debian -t calcolatrice:debian .
@@ -53,4 +53,11 @@ Per eseguire il container
 ```shell
 docker run -it --rm calcolatrice:local
 docker run -it --rm calcolatrice:alpine
+```
+
+Per costruire l'immagine Docker e caricarla su Docker Hub
+
+```shell
+docker build -f Dockerfile -t perteghella/fullstack-calcolatrice:alpine .
+docker push perteghella/fullstack-calcolatrice:alpine
 ```
