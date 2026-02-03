@@ -31,5 +31,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-calcolatrice:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-calcolatrice:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-calcolatrice:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-calcolatrice:${{ github.sha }}
