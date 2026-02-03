@@ -20,7 +20,8 @@ source .venv/bin/activate  (Linux/Mac)
 ```shell
 uv pip compile requirements/requirements-test.in -o requirements/requirements-test.txt
 uv pip compile requirements/requirements.in -o requirements/requirements.txt
-uv pip install -r requirements.txt
+uv pip install -r requirements/requirements-test.txt
+uv pip install -r requirements/requirements.txt
 ```
 
 
