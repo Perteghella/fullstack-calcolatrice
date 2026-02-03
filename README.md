@@ -67,3 +67,7 @@ Per costruire una immagine multiarchitettura e caricarla su Docker Hub
 ```shell
 docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t perteghella/fullstack-calcolatrice:alpine --push .
 ```
+
+## Aggiunte workflow GitHub Actions
+
+- pytest.yml: Esecuzione dei test con pytest
