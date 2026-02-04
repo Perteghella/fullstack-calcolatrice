@@ -10,16 +10,22 @@ Esempi di utilizzo:
 docker build -f Dockerfile -t calcolatrice:alpine .
 ```
 
-- Avviare e rimanere attaccati (equivalente a `docker run -it calcolatrice:alpine`):
+- Avviare e rimanere attaccati — mostra i log ma **non sempre** permette l'input interattivo:
 
 ```bash
-docker compose up
+docker compose run calcolatrice
 ```
 
-- Eseguire un singolo container e rimuoverlo al termine (equivalente a `docker run --rm -it`):
+- Eseguire interattivamente un singolo container (equivalente a `docker run --rm -it`):
 
 ```bash
 docker compose run --rm calcolatrice
 ```
 
 > Nota: `docker compose up` terrà il processo in foreground; per rilasciare il terminale usare `Ctrl+C` o avviare in background con `-d` se necessario.
+
+Per comodità è incluso uno script `run-interactive.sh` che esegue il comando interattivo:
+
+```bash
+./run-interactive.sh
+```
