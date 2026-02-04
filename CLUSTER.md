@@ -1,4 +1,3 @@
-````markdown
 # WSL2 – Creare 2 istanze Debian separate (procedura funzionante)
 
 Questa procedura permette di creare **due istanze Debian indipendenti** su **Windows con WSL2**, includendo i file necessari e i passaggi corretti.
