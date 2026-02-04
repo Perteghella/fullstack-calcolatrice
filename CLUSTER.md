@@ -1,122 +1,262 @@
-## WSL2 — Creare 2 istanze Debian e configurare risorse
+````markdown
+# WSL2 – Creare 2 istanze Debian separate (procedura funzionante)
 
-Queste istruzioni sono per Windows con WSL2. WSL2 è leggero e integrato in Windows, ma ha limitazioni: le risorse (CPU, memoria) si configurano globalmente in `~/.wslconfig` e la rete è NAT verso l'host (non esiste facilmente una rete "internal" isolata fra distro). Se vuoi VM con risorse garantite e rete interna, prendi in considerazione Hyper‑V.
+Questa procedura permette di creare **due istanze Debian indipendenti** su **Windows con WSL2**, includendo i file necessari e i passaggi corretti.
 
-### 1) Prerequisiti
-- Windows 10/11 (preferibilmente aggiornato)
-- PowerShell eseguito come amministratore
-- Connessione internet per scaricare immagini
+---
 
-### 2) Installare/aggiornare WSL2
-Apri PowerShell come amministratore ed esegui:
+## 1) Prerequisiti
+
+- Windows 10 / 11 aggiornato
+- PowerShell eseguito come **Amministratore**
+- Connessione Internet
+
+---
+
+## 2) Installare o aggiornare WSL2
+
+Aprire PowerShell come amministratore ed eseguire:
 
 ```powershell
 wsl --install
 wsl --update
 wsl --status
-```
+````
 
-Se vuoi installare direttamente Debian fornito da Microsoft Store puoi usare:
+Verificare che la versione predefinita sia **WSL 2**.
 
-```powershell
-wsl --install -d Debian
-```
+---
 
-### 3) Creare due distro Debian separate (import da tarball)
-Scarica un rootfs o una cloud image Debian (tar.gz). Poi importa due istanze:
+## 3) Scaricare un rootfs Debian compatibile con WSL
+
+È necessario un **root filesystem (tar.gz) compatibile con WSL**. Un repository comunemente usato per ottenere rootfs Debian “puliti” è:
+
+[https://github.com/debuerreotype/docker-debian-artifacts](https://github.com/debuerreotype/docker-debian-artifacts)
+
+Scaricare un file del tipo:
+
+* `debian-12-amd64.tar.gz`
+
+Salvare il file in:
+
+* `C:\wsl\images\`
+
+Esempio:
+
+* `C:\wsl\images\debian-12-amd64.tar.gz`
+
+---
+
+## 4) Importare 2 istanze Debian separate
+
+Creare le directory di destinazione:
 
 ```powershell
 mkdir C:\wsl\images
-# salva qui debian-rootfs.tar.gz
-
-# importa due distro
-wsl --import Debian1 C:\wsl\debian1 C:\wsl\images\debian-rootfs.tar.gz --version 2
-wsl --import Debian2 C:\wsl\debian2 C:\wsl\images\debian-rootfs.tar.gz --version 2
+mkdir C:\wsl\debian1
+mkdir C:\wsl\debian2
 ```
 
-In alternativa puoi installare una sola Debian dal Microsoft Store e clonare con `wsl --export`/`--import`.
+Importare le due distro:
 
-### 4) Configurare risorse globali (memoria/processori)
-Crea o edita `C:\Users\<TUO_UTENTE>\.wslconfig` con:
-
+```powershell
+wsl --import Debian1 C:\wsl\debian1 C:\wsl\images\debian-12-amd64.tar.gz --version 2
+wsl --import Debian2 C:\wsl\debian2 C:\wsl\images\debian-12-amd64.tar.gz --version 2
 ```
+
+Verifica:
+
+```powershell
+wsl -l -v
+```
+
+---
+
+## 5) Configurare risorse globali WSL2
+
+Creare o modificare il file:
+
+* `C:\Users\<TUO_UTENTE>\.wslconfig`
+
+Contenuto consigliato:
+
+```ini
 [wsl2]
 memory=4GB
 processors=2
 localhostForwarding=true
 ```
 
-Questa configurazione è globale per tutte le distro; riavvia WSL per applicarla:
+**Nota importante:**
+
+* Le risorse sono **globali per tutte le distro**
+* Non è possibile assegnare memoria o CPU per singola distro tramite `.wslconfig`
+
+Applicare la configurazione:
 
 ```powershell
 wsl --shutdown
 ```
 
-Nota: se imposti `memory=4GB` e `processors=2` questo è il limite globale: non è possibile dare 4GB a ciascuna distro separatamente tramite `.wslconfig`.
+---
 
-### 5) Creare l'utente `user` con password `Pa$$w0rd` in ogni distro
+## 6) Creare l’utente `user` con privilegi sudo (in entrambe le distro)
+
+> Nota: i rootfs importati spesso **non includono `sudo`**. Per questo si installa prima.
+
+### Debian1
+
+Aprire la shell:
 
 ```powershell
 wsl -d Debian1
-# dentro la shell Debian1
-adduser --gecos "" user
-echo 'user:Pa$$w0rd' | sudo chpasswd
-usermod -aG sudo user
-exit
+```
 
-wsl -d Debian2
-# dentro la shell Debian2
-adduser --gecos "" user
-echo 'user:Pa$$w0rd' | sudo chpasswd
+Dentro Debian:
+
+```bash
+apt update
+apt install -y sudo
+
+adduser user
 usermod -aG sudo user
+
 exit
 ```
 
-### 6) Spazio disco (VHDX) — come ottenere ~30GB
-Il filesystem WSL2 usa un file VHDX dinamico nella cartella della distro (es. `%USERPROFILE%\\AppData\\Local\\Packages\\...` o la cartella che hai scelto durante `--import`). Per avere un VHDX di ~30GB puoi:
+### Debian2
 
-- Esportare la distro, creare un VHDX nuovo di dimensione fissa e reimportare; esempio (procedura sintetica):
+Aprire la shell:
 
 ```powershell
-# esporta
-wsl --export Debian1 C:\wsl\exports\debian1.tar
-# crea VHDX con Hyper-V tools (PowerShell) o usa diskpart per creare un VHD/VHDX
-# poi importa specificando la cartella con il VHDX creato
-wsl --import Debian1 C:\wsl\debian1 C:\wsl\exports\debian1.tar --version 2
+wsl -d Debian2
 ```
 
-Per semplicità, è spesso più pratico usare Hyper‑V se hai bisogno di dischi a dimensione fissa esatta.
+Dentro Debian:
 
-### 7) Rete e comunicazione tra le due distro
-- Le distro WSL2 condividono la stessa rete virtuale NAT verso l'host. Possono comunicare tra loro tramite gli IP privati assegnati dal motore WSL (usa `ip addr` dentro ogni distro per vedere l'IP). L'host può raggiungerle via `localhost` (se `localhostForwarding=true`).
-- Non esiste un modo nativo semplice per creare una rete "internal" isolata solo fra le distro in WSL2; per questo usare Hyper‑V o VirtualBox è preferibile se serve isolamento di rete.
+```bash
+apt update
+apt install -y sudo
 
-### 8) Esempi utili di comandi
+adduser user
+usermod -aG sudo user
 
-- Lista distro e stato:
+exit
+```
+
+La password viene impostata **interattivamente** durante `adduser`.
+
+---
+
+## 7) Impostare `user` come utente di default (in entrambe le distro)
+
+### Debian1
+
+Entrare come root:
+
+```powershell
+wsl -d Debian1 --user root
+```
+
+Impostare il default user tramite `/etc/wsl.conf`:
+
+```bash
+printf "[user]\ndefault=user\n" > /etc/wsl.conf
+exit
+```
+
+### Debian2
+
+Entrare come root:
+
+```powershell
+wsl -d Debian2 --user root
+```
+
+Impostare il default user:
+
+```bash
+printf "[user]\ndefault=user\n" > /etc/wsl.conf
+exit
+```
+
+Applicare:
+
+```powershell
+wsl --shutdown
+```
+
+Verifica: aprendo `wsl -d Debian1` dovresti entrare direttamente come `user`.
+
+---
+
+## 8) Spazio disco (VHDX): comportamento reale
+
+* WSL2 usa un file **VHDX dinamico** per ogni distro
+* Il VHDX cresce automaticamente al bisogno
+* **Non è possibile fissare un limite reale a 30 GB** in modo “nativo” come una VM Hyper-V
+
+Operazioni utili:
+
+* Controllo spazio: `df -h`
+* Pulizia: `apt clean`
+* Riduzione/ricompattazione tipicamente richiede procedure di export/import o strumenti specifici
+
+Se servono dischi “fissi” o limiti rigidi → valutare **Hyper-V**.
+
+---
+
+## 9) Rete tra le due distro
+
+* Le distro WSL2 sono in rete NAT (virtuale) e possono comunicare tra loro tramite IP privati
+* Per vedere l’IP dentro ogni distro:
+
+```bash
+ip addr
+```
+
+Limitazioni:
+
+* Non c’è un meccanismo semplice “host-only/internal” isolato tra sole distro
+* Per isolamento di rete reale → Hyper-V / VMware / VirtualBox
+
+---
+
+## 10) Comandi utili
+
+Elenco distro:
 
 ```powershell
 wsl -l -v
 ```
 
-- Accedere alla shell di una distro:
+Accedere a una distro:
 
 ```powershell
 wsl -d Debian1
 ```
 
-- Esportare/Importare una distro:
+Spegnere WSL (applica `.wslconfig` e riavvia ambiente):
 
 ```powershell
-wsl --export Debian1 C:\wsl\exports\debian1.tar
-wsl --import Debian1Back C:\wsl\debian1back C:\wsl\exports\debian1.tar --version 2
+wsl --shutdown
 ```
 
-### 9) Cosa non è possibile (limiti)
-- Non puoi assegnare 4GB *per ogni distro* tramite `.wslconfig` (è un limite globale). Se vuoi risorse garantite per VM separate, usa Hyper‑V.
-- Non esiste una semplice rete host-only isolata tra sola due distro WSL2.
+Export / Import:
+
+```powershell
+mkdir C:\wsl\exports
+
+wsl --export Debian1 C:\wsl\exports\debian1.tar
+wsl --import Debian1Copy C:\wsl\debian1copy C:\wsl\exports\debian1.tar --version 2
+```
 
 ---
 
-Se vuoi, procedo ad aggiungere la procedura Hyper‑V completa nel file, o genero script PowerShell per automatizzare l'import/installazione. Fammi sapere quale preferisci.
+## 11) Limiti strutturali di WSL2 (da sapere)
 
+* Risorse (CPU/RAM) configurabili solo **globalmente**
+* Disco **dinamico** (non “fisso” come VM classiche)
+* Networking semplificato (NAT), niente isolamento interno “facile”
+
+Per VM “vere” con isolamento e risorse garantite → **Hyper-V**
