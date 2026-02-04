@@ -1,4 +1,19 @@
-# Calcolatrice con pipeline di operazioni
+# Calcolatrice in python
+
+Progetto per il corso di Full Stack Developer di ITS Olivetti anno 2 - ed. 2025-2026  
+
+Progetto di calcolatrice in ptython che esegue una serie di operazioni aritmetiche.
+Viene definita una pipeline su github che produce una immagine docker con l'applicazione su Docker Hub.
+
+Si utilizza la metodologia TDD (Test Driven Development) per lo sviluppo dell'applicazione, con l'utilizzo di pytest per i test e uv per la gestione dell'ambiente virtuale e delle dipendenze.
+
+L'applicazione viene eseguita in :
+- locale con l'ambiente virtuale uv
+- in un container docker basato su alpine linux
+- in un docker compose
+- in un cluster k3s locale
+
+
 
 ## UV
 
