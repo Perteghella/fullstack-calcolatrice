@@ -1,0 +1,5 @@
+[user]
+# Imposta qui l'utente di default della distro
+# Esempio:
+# default=user
+default=user

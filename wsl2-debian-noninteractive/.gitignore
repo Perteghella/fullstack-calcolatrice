@@ -1,0 +1,13 @@
+# Ignore big rootfs files and local data
+templates/*.tar
+templates/*.tar.gz
+*.vhdx
+wsl2-debian-noninteractive/templates/*
+
+# Editor
+.vscode/
+*.swp
+
+# Env
+.env
+.env.local
