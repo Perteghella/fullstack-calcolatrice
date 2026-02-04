@@ -1,0 +1,8 @@
+
+services:
+  game2048:
+    image: kubespheredev/2048:latest
+    ports:
+      - "8080:80"  # mappa la porta 80 del container sulla porta 8080 dell'host
+    restart: unless-stopped
+    # Accedi poi a http://localhost:8080
