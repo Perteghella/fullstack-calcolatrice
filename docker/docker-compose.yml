@@ -1,0 +1,12 @@
+# Docker Compose file per il servizio calcolatrice
+# 2026-02-04
+services:
+  calcolatrice:
+    image: perteghella/fullstack-calcolatrice:latest
+    stdin_open: true   # -i
+    tty: true          # -t
+    restart: "no"
+    # Per eseguire come "docker run -it calcolatrice:alpine" usare:
+    #    docker compose up
+    # oppure per un "run --rm" equivalente:
+    #    docker compose run --rm calcolatrice
